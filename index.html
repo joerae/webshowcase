@@ -27,7 +27,7 @@
   @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
   h1 { font-family: 'Syne', sans-serif; font-size: clamp(3rem, 8vw, 5.5rem); font-weight: 800; line-height: 1.0; letter-spacing: -0.02em; margin-bottom: 24px; }
   .highlight { color: var(--yellow); }
-  .subtitle { font-size: 18px; color: var(--muted); max-width: 480px; line-height: 1.6; }
+  .subtitle { font-size: 18px; color: var(--muted); max-width: 480px; line-height: 1.6; white-space: nowrap; }
   .section-label { font-size: 11px; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 24px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
 
   /* GRID */
@@ -40,10 +40,14 @@
 
   /* IMAGE */
   .card-image { width: 100%; aspect-ratio: 16/9; overflow: hidden; background: rgba(255,255,255,0.04); position: relative; flex-shrink: 0; }
-  .card-image img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.35s ease; }
+  .card-image img { position: relative; z-index: 1; width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.35s ease; }
   .card:hover .card-image img { transform: scale(1.04); }
-  .card-image-placeholder { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: rgba(240,238,248,0.2); font-size: 13px; }
-  .card-image-placeholder .ph-icon { font-size: 28px; opacity: 0.4; }
+  .card-image-placeholder { position: absolute; inset: 0; z-index: 0; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-end; gap: 8px; padding: 22px; overflow: hidden; background: linear-gradient(135deg, var(--card-bg), var(--navy)); color: var(--text); text-align: left; }
+  .card-image-placeholder::before { content: ""; position: absolute; inset: 14px; border: 1px solid var(--border); border-radius: 14px; opacity: 0.9; }
+  .card-image-placeholder::after { content: ""; position: absolute; top: 20px; left: 22px; right: 22px; height: 4px; border-radius: 100px; background: linear-gradient(90deg, var(--yellow), var(--teal), var(--coral)); }
+  .ph-kicker, .ph-title { position: relative; z-index: 1; }
+  .ph-kicker { font-size: 10px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--teal); }
+  .ph-title { font-family: 'Syne', sans-serif; font-size: clamp(16px, 4vw, 26px); font-weight: 800; line-height: 1.0; letter-spacing: 0; color: var(--yellow); max-width: 100%; overflow: hidden; }
 
   /* BODY */
   .card-body { padding: 20px 24px 20px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
@@ -89,6 +93,23 @@
   .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
   .tag { font-size: 12px; padding: 5px 12px; border-radius: 100px; border: 1px solid var(--border); color: var(--muted); }
 
+  /* VIDEO CARDS */
+  .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-bottom: 80px; }
+  .video-card { background: var(--card-bg); border-radius: 20px; border: 1px solid var(--border); text-decoration: none; color: inherit; display: flex; flex-direction: column; overflow: hidden; transition: transform 0.2s ease, border-color 0.2s ease; animation: fadeUp 0.6s ease both; }
+  .video-card:hover { transform: translateY(-4px); border-color: rgba(255,255,255,0.18); }
+  .video-thumb { width: 100%; aspect-ratio: 16/9; position: relative; overflow: hidden; background: rgba(255,255,255,0.04); flex-shrink: 0; }
+  .video-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.35s ease; }
+  .video-card:hover .video-thumb img { transform: scale(1.04); }
+  .play-btn { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.25); transition: background 0.2s ease; }
+  .video-card:hover .play-btn { background: rgba(0,0,0,0.1); }
+  .play-icon { width: 52px; height: 52px; border-radius: 50%; background: rgba(255,233,78,0.9); display: flex; align-items: center; justify-content: center; transition: transform 0.2s ease; }
+  .video-card:hover .play-icon { transform: scale(1.1); }
+  .play-icon svg { width: 20px; height: 20px; fill: var(--navy); margin-left: 3px; }
+  .video-body { padding: 20px 24px 24px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+  .video-kicker { font-size: 10px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--teal); }
+  .video-card h2 { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; color: var(--yellow); line-height: 1.2; }
+  .video-card p { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
   footer { margin-top: 80px; text-align: center; font-size: 13px; color: rgba(240,238,248,0.25); }
 
   @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
@@ -121,14 +142,14 @@
     <a href="https://medcheker.netlify.app/" target="_blank" class="card">
       <div class="card-image">
         <img src="images/medcheker.png" alt="Medcheker screenshot" onerror="this.style.display='none'">
-        <div class="card-image-placeholder"><span class="ph-icon">💊</span><span>images/medcheker.png</span></div>
+        <div class="card-image-placeholder"><span class="ph-kicker">Live demo</span><span class="ph-title">Medchecker</span></div>
       </div>
       <div class="card-body">
         <div class="card-top">
           <h2>Medchecker</h2>
           <span class="badge badge-live">Live</span>
         </div>
-        <p>Helps parents double-check medication. I made this after my daughter had paracetemol poisioning from an incorrect dose. </p>
+        <p>Helps parents double-check medication. I made this after my daughter had paracetamol poisoning from an incorrect dose.</p>
         <div class="card-divider"></div>
         <div class="card-meta">
           <div class="meta-row">
@@ -158,7 +179,7 @@
     <a href="https://baitclicker.netlify.app/" target="_blank" class="card">
       <div class="card-image">
         <img src="images/baitclicker.png" alt="Baitclicker screenshot" onerror="this.style.display='none'">
-        <div class="card-image-placeholder"><span class="ph-icon">🎮</span><span>images/baitclicker.png</span></div>
+        <div class="card-image-placeholder"><span class="ph-kicker">Live demo</span><span class="ph-title">Baitclicker</span></div>
       </div>
       <div class="card-body">
         <div class="card-top">
@@ -196,7 +217,7 @@
     <a href="https://maths-monsters.netlify.app/" target="_blank" class="card">
       <div class="card-image">
         <img src="images/maths-monsters.png" alt="Maths Monsters screenshot" onerror="this.style.display='none'">
-        <div class="card-image-placeholder"><span class="ph-icon">👾</span><span>images/maths-monsters.png</span></div>
+        <div class="card-image-placeholder"><span class="ph-kicker">Live demo</span><span class="ph-title">Maths Monsters</span></div>
       </div>
       <div class="card-body">
         <div class="card-top">
@@ -224,22 +245,27 @@
       </div>
     </a>
 
+  </div><!-- /grid -->
+
+  <div class="section-label">In Progress</div>
+  <div class="grid">
+
     <!-- ============================================================
          CARD: AI SLOP DETECTIVE
-         Status: coming soon — remove "card-static" and add href="..."
+         Status: In Progress. Remove "card-static" and add href="..."
          when deployed. Image: images/slop-detective.png
     ============================================================ -->
     <div class="card card-static">
       <div class="card-image">
         <img src="images/slop-detective.png" alt="AI Slop Detective screenshot" onerror="this.style.display='none'">
-        <div class="card-image-placeholder"><span class="ph-icon">🔍</span><span>images/slop-detective.png</span></div>
+        <div class="card-image-placeholder"><span class="ph-kicker">In Progress</span><span class="ph-title">AI Slop Detective</span></div>
       </div>
       <div class="card-body">
         <div class="card-top">
           <h2>AI Slop Detective</h2>
-          <span class="badge badge-soon">Coming soon</span>
+          <span class="badge badge-wip">In Progress</span>
         </div>
-        <p>COMING SOON! A writing editor which indenfies common AI slop patterns, and helps you rewrite to avoid them. It works brilliantly in Google's AI Studio, but I'm yet to adapt it to a public facing site.</p>
+        <p>A writing editor that identifies common AI slop patterns and helps you rewrite to avoid them. It works brilliantly in Google's AI Studio, but I'm yet to adapt it to a public-facing site.</p>
         <div class="card-divider"></div>
         <div class="card-meta">
           <div class="meta-row">
@@ -262,19 +288,19 @@
 
     <!-- ============================================================
          CARD: OH REALLY?
-         Status: in progress. Image: images/oh-really.png
+         Status: In Progress. Image: images/oh-really.png
     ============================================================ -->
     <div class="card card-static">
       <div class="card-image">
         <img src="images/oh-really.png" alt="Oh Really screenshot" onerror="this.style.display='none'">
-        <div class="card-image-placeholder"><span class="ph-icon">🧐</span><span>images/oh-really.png</span></div>
+        <div class="card-image-placeholder"><span class="ph-kicker">In Progress</span><span class="ph-title">Oh Really?</span></div>
       </div>
       <div class="card-body">
         <div class="card-top">
           <h2>Oh Really?</h2>
-          <span class="badge badge-wip">In progress</span>
+          <span class="badge badge-wip">In Progress</span>
         </div>
-        <p>COMING SOON! This was my Dad's idea, and we coded it together in an afternoon. Cites academic sources to prove or debunk things you've heard. It works brilliantly in Google's AI Studio, but I'm yet to adapt it to a public facing site.</p>
+        <p>This was my Dad's idea, and we coded it together in an afternoon. It cites academic sources to prove or debunk things you've heard, but I'm yet to adapt it to a public-facing site.</p>
         <div class="card-divider"></div>
         <div class="card-meta">
           <div class="meta-row">
@@ -296,6 +322,51 @@
 
   </div><!-- /grid -->
 
+
+  <!-- VIDEOS -->
+  <div class="section-label">Videos</div>
+  <div class="video-grid">
+
+    <!-- WHAT THE DRAW?! — YouTube ID: 1eNymDbk190 -->
+    <a href="https://youtu.be/1eNymDbk190" target="_blank" class="video-card">
+      <div class="video-thumb">
+        <img src="https://img.youtube.com/vi/1eNymDbk190/maxresdefault.jpg"
+             onerror="this.src='https://img.youtube.com/vi/1eNymDbk190/hqdefault.jpg'"
+             alt="What the Draw?! video thumbnail">
+        <div class="play-btn">
+          <div class="play-icon">
+            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          </div>
+        </div>
+      </div>
+      <div class="video-body">
+        <span class="video-kicker">2UP Games · Live Game</span>
+        <h2>What the Draw?!</h2>
+        <p>Our first live game using generative AI. I led the team which made What the Draw?!, where anyone can make a masterpiece.</p>
+      </div>
+    </a>
+
+    <!-- GET CRAFTY — YouTube ID: X4cuyRs1kBQ -->
+    <a href="https://youtube.com/shorts/X4cuyRs1kBQ" target="_blank" class="video-card">
+      <div class="video-thumb">
+        <img src="https://img.youtube.com/vi/X4cuyRs1kBQ/maxresdefault.jpg"
+             onerror="this.src='https://img.youtube.com/vi/X4cuyRs1kBQ/hqdefault.jpg'"
+             alt="Get Crafty video thumbnail">
+        <div class="play-btn">
+          <div class="play-icon">
+            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          </div>
+        </div>
+      </div>
+      <div class="video-body">
+        <span class="video-kicker">2UP Games · Live Game</span>
+        <h2>Get Crafty!</h2>
+        <p>The followup where users can indulge in mindful crafting. We gave players control with a simple stencil input method, and loveable outputs using our own custom pipeline.</p>
+      </div>
+    </a>
+
+  </div><!-- /video-grid -->
+
   <!-- ABOUT -->
   <div class="about">
     <div class="section-label">About</div>
@@ -307,7 +378,7 @@
       </div>
       <div>
         <h3>Hi, I'm Joe.</h3>
-        <p>I really making things. Over the past year this has become easier with brilliant tools to help make things quicker. My main goal has to been to learn the opportunities and struggles of making things using generative AI.</p>
+        <p>I really like making things. Over the past year this has become easier with brilliant tools to help make things quicker. My main goal has been to learn the opportunities and struggles of making things using generative AI.</p>
         <p>This is my public scratchpad. Some things are polished. Most are experiments. All of them were fun to make.</p>
         <div class="tags">
           <span class="tag">AI product</span>
