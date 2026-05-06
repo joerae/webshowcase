@@ -498,6 +498,10 @@
       filter: grayscale(0);
     }
 
+    .about-photo-wrap.in-view {
+      animation: colorFlashToGray 2s ease;
+    }
+
     .about-photo-wrap img {
       width: 100%;
       height: 100%;
@@ -677,7 +681,7 @@
     <section id="about">
       <div class="about-grid">
         <div>
-          <div class="about-photo-wrap" id="about-photo">
+          <div class="about-photo-wrap" id="about-photo" data-observe>
             <img src="images/joe.jpg" alt="Joe" onerror="this.parentElement.innerHTML='<span class=\'about-photo-fallback\'>JR</span>'">
           </div>
           <div class="about-dots">
