@@ -220,6 +220,7 @@
 
     @media (min-width: 1024px) {
       .card-image { filter: grayscale(1); }
+      .card.in-view .card-image { animation: colorFlashToGray 1500ms ease var(--stagger-delay, 0s); }
       .card:hover .card-image { filter: grayscale(0); }
     }
 
@@ -382,7 +383,10 @@
       transform: translateX(0);
     }
 
-    @media (min-width: 1024px) { .video-card { filter: grayscale(1); } }
+    @media (min-width: 1024px) {
+      .video-card { filter: grayscale(1); }
+      .video-card.in-view { animation: colorFlashToGray 1500ms ease var(--stagger-delay, 0s); }
+    }
     .video-card:hover { filter: grayscale(0); }
 
     .video-thumb {
@@ -486,7 +490,12 @@
       align-items: center;
       justify-content: center;
       filter: grayscale(1);
+      transition: filter 0.7s ease;
       overflow: hidden;
+    }
+
+    .about-photo-wrap:hover {
+      filter: grayscale(0);
     }
 
     .about-photo-wrap img {
@@ -618,6 +627,11 @@
 
     @keyframes slideIn {
       to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes colorFlashToGray {
+      0% { filter: grayscale(0); }
+      100% { filter: grayscale(1); }
     }
   </style>
 </head>
@@ -864,7 +878,9 @@
           siblings.forEach(sib => {
             const sibTop = Math.round(sib.getBoundingClientRect().top + window.scrollY);
             if (Math.abs(sibTop - elTop) < 20) {
-              sib.style.transitionDelay = `${colIndex * 0.1}s`;
+              const delay = `${colIndex * 0.1}s`;
+              sib.style.transitionDelay = delay;
+              sib.style.setProperty('--stagger-delay', delay);
               sib.classList.add('in-view');
               colIndex++;
             }
@@ -872,11 +888,13 @@
           // Catch el itself if not already handled
           if (!el.classList.contains('in-view')) {
             el.style.transitionDelay = '0s';
+            el.style.setProperty('--stagger-delay', '0s');
             el.classList.add('in-view');
           }
         } else {
           // Scrolled out — reset so it re-animates next time
           el.style.transitionDelay = '0s';
+          el.style.removeProperty('--stagger-delay');
           el.classList.remove('in-view');
         }
       });
