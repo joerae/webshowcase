@@ -1,406 +1,925 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Joe's AI Showcase</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --yellow: #FFE94E; --coral: #FF5C3A; --teal: #00C9A7; --purple: #7B5EF6;
-    --navy: #0F0E1A; --card-bg: #1E1C2E; --border: rgba(255,255,255,0.08);
-    --text: #F0EEF8; --muted: rgba(240,238,248,0.5);
-  }
-  body { font-family: 'DM Sans', sans-serif; background-color: var(--navy); color: var(--text); min-height: 100vh; }
-  .noise { position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events: none; z-index: 0; opacity: 0.6; }
-  .blob { position: fixed; border-radius: 50%; filter: blur(120px); pointer-events: none; z-index: 0; }
-  .blob-1 { width: 500px; height: 500px; background: rgba(123,94,246,0.18); top: -100px; right: -100px; }
-  .blob-2 { width: 400px; height: 400px; background: rgba(0,201,167,0.12); bottom: 200px; left: -100px; }
-  .blob-3 { width: 300px; height: 300px; background: rgba(255,92,58,0.1); top: 50%; left: 40%; }
-  .wrap { position: relative; z-index: 1; max-width: 1280px; margin: 0 auto; padding: 80px 40px 120px; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Joe's Showcase</title>
+  <meta name="description" content="A collection of tools, toys, and experiments built with AI by Joe Raeburn.">
+  <meta property="og:title" content="Joe's Showcase">
+  <meta property="og:description" content="A collection of tools, toys, and experiments built with AI by Joe Raeburn.">
+  <meta property="og:image" content="https://joeraeburn.netlify.app/images/joe.jpg">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Joe's Showcase">
+  <meta name="twitter:description" content="A collection of tools, toys, and experiments built with AI by Joe Raeburn.">
+  <meta name="twitter:image" content="https://joeraeburn.netlify.app/images/joe.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@800&family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    /* ── TOKENS ── */
+    :root {
+      --accent: #E0FF00;
+      --bg: #FAF9F6;
+      --ink: #1A1A1A;
+      --muted: #666666;
+      --font-display: 'Syne', sans-serif;
+      --font-body: 'Inter', sans-serif;
+    }
 
-  /* HERO */
-  .hero { margin-bottom: 80px; animation: fadeUp 0.6s ease both; }
-  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--yellow); margin-bottom: 20px; }
-  .dot-blink { width: 7px; height: 7px; border-radius: 50%; background: var(--teal); animation: blink 1.8s ease infinite; }
-  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
-  h1 { font-family: 'Syne', sans-serif; font-size: clamp(3rem, 8vw, 5.5rem); font-weight: 800; line-height: 1.0; letter-spacing: -0.02em; margin-bottom: 24px; }
-  .highlight { color: var(--yellow); }
-  .subtitle { font-size: 18px; color: var(--muted); max-width: 480px; line-height: 1.6; white-space: nowrap; }
-  .section-label { font-size: 11px; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 24px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  /* GRID */
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 18px; margin-bottom: 80px; }
+    html { scroll-behavior: smooth; }
 
-  /* CARD */
-  .card { background: var(--card-bg); border-radius: 20px; border: 1px solid var(--border); text-decoration: none; color: inherit; display: flex; flex-direction: column; position: relative; overflow: hidden; transition: transform 0.2s ease, border-color 0.2s ease; animation: fadeUp 0.6s ease both; }
-  .card:hover { transform: translateY(-4px); border-color: rgba(255,255,255,0.18); }
-  .card-static { pointer-events: none; opacity: 0.6; }
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--ink);
+      overflow-x: hidden;
+      position: relative;
+    }
 
-  /* IMAGE */
-  .card-image { width: 100%; aspect-ratio: 16/9; overflow: hidden; background: rgba(255,255,255,0.04); position: relative; flex-shrink: 0; }
-  .card-image img { position: relative; z-index: 1; width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.35s ease; }
-  .card:hover .card-image img { transform: scale(1.04); }
-  .card-image-placeholder { position: absolute; inset: 0; z-index: 0; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 8px; padding: 44px 22px 22px; overflow: hidden; background: linear-gradient(135deg, var(--card-bg), var(--navy)); color: var(--text); text-align: left; }
-  .card-image-placeholder::before { content: ""; position: absolute; inset: 14px; border: 1px solid var(--border); border-radius: 14px; opacity: 0.9; }
-  .card-image-placeholder::after { content: ""; position: absolute; top: 20px; left: 22px; right: 22px; height: 4px; border-radius: 100px; background: linear-gradient(90deg, var(--yellow), var(--teal), var(--coral)); }
-  .ph-kicker, .ph-title { position: relative; z-index: 1; }
-  .ph-kicker { font-size: 10px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--teal); }
-  .ph-title { font-family: 'Syne', sans-serif; font-size: clamp(24px, 3vw, 34px); font-weight: 800; line-height: 0.98; letter-spacing: 0; color: var(--yellow); max-width: 100%; overflow: visible; }
+    ::selection { background: var(--accent); color: var(--ink); }
 
-  /* BODY */
-  .card-body { padding: 20px 24px 20px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
-  .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
-  .card h2 { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; line-height: 1.2; color: var(--yellow); }
-  .card p  { font-size: 14px; color: var(--muted); line-height: 1.6; }
-  .grid-projects .card-top { min-height: 48px; }
-  .grid-projects .card p { min-height: 8em; }
-  @media(max-width: 680px) {
-    .wrap { padding-inline: 24px; }
-    .grid { grid-template-columns: 1fr; }
-    .grid-projects .card-top,
-    .grid-projects .card p { min-height: 0; }
-  }
+    /* ── NOISE ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 50;
+      opacity: 0.8;
+    }
 
-  /* BADGES */
-  .badge { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 10px; border-radius: 100px; flex-shrink: 0; }
-  .badge-live { background: rgba(0,201,167,0.15); color: #00C9A7; }
-  .badge-soon { background: rgba(255,233,78,0.12); color: #FFE94E; }
-  .badge-wip  { background: rgba(240,238,248,0.08); color: var(--muted); }
+    /* ── BLOB ── */
+    .blob {
+      position: fixed;
+      width: 600px;
+      height: 600px;
+      background: color-mix(in srgb, var(--accent) 5%, transparent);
+      border-radius: 50%;
+      filter: blur(80px);
+      bottom: -12rem;
+      left: -12rem;
+      pointer-events: none;
+      z-index: 0;
+    }
 
-  /* DIVIDER */
-  .card-divider { height: 1px; background: var(--border); margin: 4px 0; }
+    /* ── SCROLL GRADIENT ── */
+    /* A fixed radial orb that drifts as you scroll — warm lime glow, very subtle */
+    .gradient-orb {
+      position: fixed;
+      width: 800px;
+      height: 800px;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.12;
+      background: radial-gradient(circle, #E0FF00 0%, transparent 70%);
+      will-change: transform;
+      transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
 
-  /* TECH STACK */
-  .card-meta { display: flex; flex-direction: column; gap: 8px; padding-bottom: 4px; }
-  .meta-row { display: flex; align-items: flex-start; gap: 8px; }
-  .meta-label { font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(240,238,248,0.3); min-width: 56px; padding-top: 3px; flex-shrink: 0; }
-  .bubbles { display: flex; flex-wrap: wrap; gap: 5px; }
-  .bubble { font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 100px; border: 1px solid; white-space: nowrap; }
+    /* ── LAYOUT ── */
+    main {
+      position: relative;
+      z-index: 10;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 3rem 1.5rem 0;
+    }
 
-  /* Bubble colours: use these classes to colour-code tools and stack layers */
-  .b-yellow { border-color: rgba(255,233,78,0.3);  color: #FFE94E; background: rgba(255,233,78,0.06); }
-  .b-teal   { border-color: rgba(0,201,167,0.3);   color: #00C9A7; background: rgba(0,201,167,0.06); }
-  .b-purple { border-color: rgba(123,94,246,0.35);  color: #a78bfa; background: rgba(123,94,246,0.08); }
-  .b-coral  { border-color: rgba(255,92,58,0.3);    color: #FF8C70; background: rgba(255,92,58,0.06); }
-  .b-gray   { border-color: rgba(240,238,248,0.15); color: var(--muted); background: rgba(240,238,248,0.04); }
+    @media (min-width: 768px) {
+      main { padding: 5rem 2.5rem 0; }
+    }
 
-  /* ARROW */
-  .card-arrow { font-size: 16px; opacity: 0; transform: translateX(-6px); transition: opacity 0.2s ease, transform 0.2s ease; color: var(--yellow); margin-top: 6px; align-self: flex-end; }
-  .card:hover .card-arrow { opacity: 1; transform: translateX(0); }
-  .card-static .card-arrow { display: none; }
+    /* ── HERO ── */
+    header {
+      margin-bottom: 5rem;
+      position: relative;
+    }
 
-  /* ABOUT */
-  .about { border-top: 1px solid var(--border); padding-top: 64px; animation: fadeUp 0.8s ease 0.2s both; }
-  .about-inner { display: grid; grid-template-columns: 1fr 2fr; gap: 48px; align-items: start; }
-  @media(max-width: 560px) { .about-inner { grid-template-columns: 1fr; } }
-  .avatar { width: 96px; height: 96px; border-radius: 50%; background: linear-gradient(135deg, var(--purple), var(--coral)); display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; color: white; }
-  .about h3 { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 12px; }
-  .about p  { font-size: 15px; color: var(--muted); line-height: 1.7; margin-bottom: 12px; }
-  .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
-  .tag { font-size: 12px; padding: 5px 12px; border-radius: 100px; border: 1px solid var(--border); color: var(--muted); }
+    @media (min-width: 768px) { header { margin-bottom: 8rem; } }
 
-  /* VIDEO CARDS */
-  .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-bottom: 80px; }
-  .video-card { background: var(--card-bg); border-radius: 20px; border: 1px solid var(--border); text-decoration: none; color: inherit; display: flex; flex-direction: column; overflow: hidden; transition: transform 0.2s ease, border-color 0.2s ease; animation: fadeUp 0.6s ease both; }
-  .video-card:hover { transform: translateY(-4px); border-color: rgba(255,255,255,0.18); }
-  .video-thumb { width: 100%; aspect-ratio: 16/9; position: relative; overflow: hidden; background: rgba(255,255,255,0.04); flex-shrink: 0; }
-  .video-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.35s ease; }
-  .video-card:hover .video-thumb img { transform: scale(1.04); }
-  .play-btn { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.25); transition: background 0.2s ease; }
-  .video-card:hover .play-btn { background: rgba(0,0,0,0.1); }
-  .play-icon { width: 52px; height: 52px; border-radius: 50%; background: rgba(255,233,78,0.9); display: flex; align-items: center; justify-content: center; transition: transform 0.2s ease; }
-  .video-card:hover .play-icon { transform: scale(1.1); }
-  .play-icon svg { width: 20px; height: 20px; fill: var(--navy); margin-left: 3px; }
-  .video-body { padding: 20px 24px 24px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
-  .video-kicker { font-size: 10px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--teal); }
-  .video-card h2 { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; color: var(--yellow); line-height: 1.2; }
-  .video-card p { font-size: 14px; color: var(--muted); line-height: 1.6; }
+    .hero-inner { max-width: 56rem; }
 
-  footer { margin-top: 80px; text-align: center; font-size: 13px; color: rgba(240,238,248,0.25); }
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(3.5rem, 8.5vw, 110px);
+      font-weight: 800;
+      line-height: 0.9;
+      letter-spacing: -0.04em;
+      text-transform: uppercase;
+      margin-bottom: 4rem;
+      opacity: 0;
+      transform: scale(0.98);
+      animation: fadeScale 0.8s ease-out forwards;
+    }
 
-  @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-  .card:nth-child(1){animation-delay:.05s} .card:nth-child(2){animation-delay:.1s} .card:nth-child(3){animation-delay:.15s} .card:nth-child(4){animation-delay:.2s} .card:nth-child(5){animation-delay:.25s}
-</style>
+    .hero-title .outlined {
+      -webkit-text-stroke: 1.5px var(--ink);
+      color: transparent;
+      display: block;
+      white-space: nowrap;
+      font-size: min(8.5vw, 110px);
+    }
+
+    .show-word, .case-word {
+      display: inline-block;
+      white-space: nowrap;
+    }
+
+    .hero-sub {
+      font-size: 1.25rem;
+      color: var(--muted);
+      font-weight: 500;
+      max-width: 28rem;
+      border-left: 6px solid var(--ink);
+      padding: 0.5rem 0 0.5rem 2rem;
+      opacity: 0;
+      transform: translateX(-20px);
+      animation: slideIn 0.6s ease-out 0.4s forwards;
+    }
+
+    @media (min-width: 768px) { .hero-sub { font-size: 1.5rem; } }
+
+    /* ── SECTION HEADERS ── */
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 3rem;
+      border-bottom: 2px solid var(--ink);
+      padding-bottom: 0.75rem;
+    }
+
+    .section-label {
+      font-size: 0.65rem;
+      font-weight: 900;
+      letter-spacing: 0.5em;
+      text-transform: uppercase;
+    }
+
+    .section-count {
+      font-size: 0.625rem;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    /* ── GRID ── */
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 4rem 2.5rem;
+    }
+
+    @media (min-width: 640px) { .grid-3 { grid-template-columns: 1fr 1fr; } }
+    @media (min-width: 1024px) { .grid-3 { grid-template-columns: 1fr 1fr 1fr; } }
+
+    /* ── PROJECT CARD ── */
+    .card {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      text-decoration: none;
+      color: inherit;
+      background: transparent;
+      border-top: 1px solid var(--ink);
+      padding: 1.5rem 0;
+      opacity: 0;
+      transform: translateX(-30px);
+      transition: opacity 0.7s cubic-bezier(0.215, 0.61, 0.355, 1),
+                  transform 0.7s cubic-bezier(0.215, 0.61, 0.355, 1);
+    }
+
+    .card.in-view {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .card.disabled { cursor: default; pointer-events: none; }
+    .card.disabled.in-view { opacity: 0.6; }
+
+    .card-image {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16/9;
+      overflow: hidden;
+      background: rgba(26,26,26,0.03);
+      margin-bottom: 1.5rem;
+      transition: filter 0.7s ease;
+    }
+
+    .card-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.7s ease, filter 0.7s ease;
+    }
+
+    @media (min-width: 1024px) {
+      .card-image { filter: grayscale(1); }
+      .card:hover .card-image { filter: grayscale(0); }
+    }
+
+    .card:hover .card-image img { transform: scale(1.05); }
+
+    .card-fallback {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 2rem;
+      background: var(--ink);
+    }
+
+    .card-fallback .kicker {
+      font-size: 0.625rem;
+      font-weight: 900;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+
+    .card-fallback h3 {
+      font-family: var(--font-display);
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--bg);
+      line-height: 1;
+      letter-spacing: -0.04em;
+      text-transform: uppercase;
+    }
+
+    .card-body { display: flex; flex-direction: column; flex: 1; }
+
+    .card-title {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      text-transform: uppercase;
+      text-decoration: underline;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 4px;
+      text-decoration-color: transparent;
+      transition: text-decoration-color 0.3s;
+      margin-bottom: 0.75rem;
+      word-break: break-word;
+    }
+
+    .card:hover .card-title { text-decoration-color: var(--accent); }
+
+    .card-desc {
+      font-size: 0.875rem;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+      flex: 1;
+      border-left: 2px solid rgba(26,26,26,0.1);
+      padding-left: 1rem;
+      font-style: italic;
+    }
+
+    .card-meta { display: flex; flex-direction: column; gap: 1rem; }
+
+    .meta-row { display: flex; align-items: baseline; gap: 1rem; }
+
+    .meta-label {
+      font-size: 0.625rem;
+      font-weight: 900;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      min-width: 50px;
+    }
+
+    .meta-values { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+    .tool-tag {
+      font-size: 0.6875rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .stack-tag {
+      padding: 0.1rem 0.5rem;
+      font-size: 0.5rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+    }
+
+    .stack-accent { background: var(--accent); color: var(--ink); }
+    .stack-ink { background: var(--ink); color: var(--bg); }
+    .stack-ghost { background: rgba(102,102,102,0.1); color: var(--muted); border: 1px solid rgba(26,26,26,0.1); }
+
+    .card-cta {
+      margin-top: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.625rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      transition: gap 0.3s;
+    }
+
+    .card:hover .card-cta { gap: 1rem; }
+
+    .arrow { font-size: 1rem; }
+
+    /* ── SECTION SPACING ── */
+    section { margin-bottom: 6rem; }
+    @media (min-width: 768px) { section { margin-bottom: 8rem; } }
+
+    /* ── VIDEO SECTION ── */
+    .video-section {
+      background: var(--ink);
+      margin-left: -1.5rem;
+      margin-right: -1.5rem;
+      padding: 6rem 1.5rem;
+    }
+
+    @media (min-width: 768px) {
+      .video-section {
+        margin-left: -2.5rem;
+        margin-right: -2.5rem;
+        padding: 6rem 2.5rem;
+      }
+    }
+
+    .video-section .section-label { color: var(--accent); }
+    .video-section .section-header { border-bottom-color: rgba(250,249,246,0.2); }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+    }
+
+    @media (min-width: 768px) { .grid-2 { grid-template-columns: 1fr 1fr; } }
+
+    .video-card {
+      display: block;
+      text-decoration: none;
+      background: var(--ink);
+      border: 1px solid rgba(255,255,255,0.06);
+      opacity: 0;
+      transform: translateX(-30px);
+      transition: opacity 0.7s cubic-bezier(0.215, 0.61, 0.355, 1),
+                  transform 0.7s cubic-bezier(0.215, 0.61, 0.355, 1),
+                  filter 0.3s;
+    }
+
+    .video-card.in-view {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    @media (min-width: 1024px) { .video-card { filter: grayscale(1); } }
+    .video-card:hover { filter: grayscale(0); }
+
+    .video-thumb {
+      position: relative;
+      aspect-ratio: 16/9;
+      overflow: hidden;
+      background: rgba(250,249,246,0.05);
+    }
+
+    .video-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.8;
+      transition: transform 0.7s ease, opacity 0.3s;
+    }
+
+    .video-card:hover .video-thumb img { transform: scale(1.05); opacity: 1; }
+
+    .play-btn {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .play-circle {
+      width: 4rem;
+      height: 4rem;
+      border: 1px solid rgba(250,249,246,0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+      transition: transform 0.3s;
+    }
+
+    .video-card:hover .play-circle { transform: scale(1.1); }
+
+    .play-icon {
+      width: 0;
+      height: 0;
+      border-style: solid;
+      border-width: 8px 0 8px 14px;
+      border-color: transparent transparent transparent rgba(250,249,246,1);
+      margin-left: 3px;
+    }
+
+    .video-info {
+      padding: 2rem;
+      color: var(--bg);
+    }
+
+    .video-kicker {
+      font-size: 0.5625rem;
+      font-weight: 900;
+      letter-spacing: 0.3em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+
+    .video-title {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      color: var(--bg);
+    }
+
+    .video-desc {
+      font-size: 0.75rem;
+      color: rgba(250,249,246,0.4);
+      line-height: 1.6;
+      max-width: 28rem;
+    }
+
+    /* ── ABOUT ── */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 3rem;
+      align-items: start;
+      padding: 4rem 0 6rem;
+    }
+
+    @media (min-width: 768px) {
+      .about-grid { grid-template-columns: 4fr 8fr; gap: 5rem; }
+    }
+
+    .about-photo-wrap {
+      width: 100%;
+      aspect-ratio: 1;
+      border: 2px solid var(--ink);
+      padding: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      filter: grayscale(1);
+      overflow: hidden;
+    }
+
+    .about-photo-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .about-photo-fallback {
+      font-family: var(--font-display);
+      font-size: 5rem;
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    .about-dots {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2.5rem;
+    }
+
+    .dot {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 50%;
+    }
+
+    .dot-fill { background: var(--ink); }
+    .dot-outline { border: 2px solid var(--ink); }
+    .dot-accent { background: var(--accent); }
+
+    .about-name {
+      font-family: var(--font-display);
+      font-size: clamp(3rem, 8vw, 6rem);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      text-transform: uppercase;
+      line-height: 0.85;
+      margin-bottom: 2.5rem;
+    }
+
+    .about-text {
+      border-left: 4px solid rgba(26,26,26,0.1);
+      padding-left: 2rem;
+    }
+
+    .about-text p {
+      font-size: 1.25rem;
+      color: var(--muted);
+      line-height: 1.7;
+      font-weight: 500;
+      margin-bottom: 1.5rem;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 2.5rem;
+    }
+
+    .tag {
+      padding: 0.5rem 1.25rem;
+      font-size: 0.625rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      border: 2px solid var(--ink);
+      background: transparent;
+      transition: background 0.3s;
+      cursor: default;
+    }
+
+    .tag:hover { background: var(--accent); }
+
+    /* ── FOOTER ── */
+    footer {
+      margin-top: 6rem;
+      padding: 2.5rem 0 3rem;
+      border-top: 2px solid var(--ink);
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    @media (min-width: 768px) {
+      footer { flex-direction: row; justify-content: space-between; align-items: flex-end; }
+    }
+
+    .footer-brand {
+      font-size: 1.875rem;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      text-transform: uppercase;
+      text-decoration: underline;
+      text-decoration-thickness: 8px;
+      text-underline-offset: 8px;
+      text-decoration-color: var(--accent);
+    }
+
+    .footer-copy {
+      font-size: 0.625rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-top: 1rem;
+    }
+
+    .footer-links { display: flex; flex-wrap: wrap; gap: 2rem; }
+
+    .footer-link {
+      font-size: 0.625rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.3em;
+      color: var(--ink);
+      text-decoration: none;
+      transition: text-decoration 0.2s;
+    }
+
+    .footer-link:hover { text-decoration: line-through; text-decoration-color: var(--accent); text-decoration-thickness: 2px; }
+    .footer-link.underlined { text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 2px; text-underline-offset: 4px; }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeScale {
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes slideIn {
+      to { opacity: 1; transform: translateX(0); }
+    }
+  </style>
 </head>
 <body>
-<div class="noise"></div>
-<div class="blob blob-1"></div>
-<div class="blob blob-2"></div>
-<div class="blob blob-3"></div>
 
-<div class="wrap">
+  <div class="gradient-orb" id="orb"></div>
 
-  <div class="hero">
-    <div class="eyebrow"><span class="dot-blink"></span>vibe coding · AI demos</div>
-    <h1>Joe's AI<br><span class="highlight">Showcase.</span></h1>
-    <p class="subtitle">A collection of tools, toys, and experiments I made with AI.</p>
-  </div>
+  <main>
 
-  <div class="section-label">Demos</div>
-  <div class="grid grid-projects">
-
-    <!-- ============================================================
-         CARD: MEDCHEKER
-         Image: put a 16:9 screenshot at images/medcheker.png
-         To add more bubbles, copy a <span class="bubble b-???"> line
-         Bubble colours: b-yellow, b-teal, b-purple, b-coral, b-gray
-    ============================================================ -->
-    <a href="https://medcheker.netlify.app/" target="_blank" class="card">
-      <div class="card-image">
-        <img src="images/medcheker.png" alt="Medcheker screenshot" onerror="this.style.display='none'">
-        <div class="card-image-placeholder"><span class="ph-kicker">Live demo</span><span class="ph-title">Medchecker</span></div>
+    <!-- HERO -->
+    <header>
+      <h1 class="hero-title">
+        Joe's<br>
+        <span class="outlined" id="showcase-word"><span class="show-word">SHOW</span><wbr><span class="case-word">CASE.</span></span>
+      </h1>
+      <div class="hero-inner">
+        <p class="hero-sub">A collection of tools, toys, and experiments I made with AI.</p>
       </div>
-      <div class="card-body">
-        <div class="card-top">
-          <h2>Medchecker</h2>
-          <span class="badge badge-live">Live</span>
-        </div>
-        <p>Helps parents double-check medication. I made this after my daughter had paracetamol poisoning from an incorrect dose.</p>
-        <div class="card-divider"></div>
-        <div class="card-meta">
-          <div class="meta-row">
-            <span class="meta-label">Built with</span>
-            <div class="bubbles">
-              <span class="bubble b-purple">Codex</span>
-              <span class="bubble b-teal">VS Code</span>
-              <span class="bubble b-gray">Netlify</span>
-            </div>
-          </div>
-          <div class="meta-row">
-            <span class="meta-label">Stack</span>
-            <div class="bubbles">
-              <span class="bubble b-yellow">Frontend</span>
-              <span class="bubble b-coral">API</span>
-            </div>
-          </div>
-        </div>
-        <span class="card-arrow">→</span>
-      </div>
-    </a>
+    </header>
 
-    <!-- ============================================================
-         CARD: BAITCLICKER
-         Image: images/baitclicker.png
-    ============================================================ -->
-    <a href="https://baitclicker.netlify.app/" target="_blank" class="card">
-      <div class="card-image">
-        <img src="images/baitclicker.png" alt="Baitclicker screenshot" onerror="this.style.display='none'">
-        <div class="card-image-placeholder"><span class="ph-kicker">Live demo</span><span class="ph-title">Baitclicker</span></div>
+    <!-- LIVE DEMOS -->
+    <section id="demos">
+      <div class="section-header">
+        <span class="section-label">Index / Demos</span>
+        <span class="section-count">01 — 04</span>
       </div>
-      <div class="card-body">
-        <div class="card-top">
-          <h2>Baitclicker</h2>
-          <span class="badge badge-live">Live</span>
-        </div>
-        <p>Turns any news article into an idle clicker game. There were some fun backend challenges making this one, including letting you share your own creations.</p>
-        <div class="card-divider"></div>
-        <div class="card-meta">
-          <div class="meta-row">
-            <span class="meta-label">Built with</span>
-            <div class="bubbles">
-              <span class="bubble b-purple">Codex</span>
-              <span class="bubble b-teal">VS Code</span>
-              <span class="bubble b-gray">Netlify</span>
-            </div>
+      <div class="grid-3" id="demos-grid">
+        <!-- Cards injected by JS -->
+      </div>
+    </section>
+
+    <!-- VIDEOS -->
+    <section class="video-section" id="motion">
+      <div class="section-header">
+        <span class="section-label">Motion / Case Studies</span>
+      </div>
+      <div class="grid-2" id="video-grid">
+        <!-- Video cards injected by JS -->
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about">
+      <div class="about-grid">
+        <div>
+          <div class="about-photo-wrap" id="about-photo">
+            <img src="images/joe.jpg" alt="Joe" onerror="this.parentElement.innerHTML='<span class=\'about-photo-fallback\'>JR</span>'">
           </div>
-          <div class="meta-row">
-            <span class="meta-label">Stack</span>
-            <div class="bubbles">
-              <span class="bubble b-yellow">Frontend</span>
-              <span class="bubble b-teal">Backend</span>
-              <span class="bubble b-coral">API</span>
-            </div>
+          <div class="about-dots">
+            <div class="dot dot-fill"></div>
+            <div class="dot dot-outline"></div>
+            <div class="dot dot-accent"></div>
           </div>
         </div>
-        <span class="card-arrow">→</span>
-      </div>
-    </a>
-
-    <!-- ============================================================
-         CARD: MATHS MONSTERS
-         Image: images/maths-monsters.png
-    ============================================================ -->
-    <a href="https://maths-monsters.netlify.app/" target="_blank" class="card">
-      <div class="card-image">
-        <img src="images/maths-monsters.png" alt="Maths Monsters screenshot" onerror="this.style.display='none'">
-        <div class="card-image-placeholder"><span class="ph-kicker">Live demo</span><span class="ph-title">Maths Monsters</span></div>
-      </div>
-      <div class="card-body">
-        <div class="card-top">
-          <h2>Maths Monsters</h2>
-          <span class="badge badge-live">Live</span>
-        </div>
-        <p>I'm working on a physical card game with stickers driving long-term goals. This is a prototype I used to play with the core interaction, before I get into the real work of encouraging repeatable practice.</p>
-        <div class="card-divider"></div>
-        <div class="card-meta">
-          <div class="meta-row">
-            <span class="meta-label">Built with</span>
-            <div class="bubbles">
-              <span class="bubble b-yellow">Gemini</span>
-              <span class="bubble b-gray">AI Studio</span>
-            </div>
+        <div>
+          <h3 class="about-name">Hi, I'm Joe.</h3>
+          <div class="about-text">
+            <p>I really like making things. Over the past year this has become easier with brilliant tools to help make things quicker. My main goal has been to learn the opportunities and struggles of making things using generative AI.</p>
+            <p>This is my public scratchpad. Some things are polished. Most are experiments. All of them were fun to make.</p>
           </div>
-          <div class="meta-row">
-            <span class="meta-label">Stack</span>
-            <div class="bubbles">
-              <span class="bubble b-yellow">Frontend</span>
-            </div>
-          </div>
-        </div>
-        <span class="card-arrow">→</span>
-      </div>
-    </a>
-
-  </div><!-- /grid -->
-
-  <div class="section-label">In Progress</div>
-  <div class="grid grid-projects">
-
-    <!-- ============================================================
-         CARD: AI SLOP DETECTIVE
-         Status: In Progress. Remove "card-static" and add href="..."
-         when deployed. Image: images/slop-detective.png
-    ============================================================ -->
-    <div class="card card-static">
-      <div class="card-image">
-        <img src="images/slop-detective.png" alt="AI Slop Detective screenshot" onerror="this.style.display='none'">
-        <div class="card-image-placeholder"><span class="ph-kicker">In Progress</span><span class="ph-title">AI Slop Detective</span></div>
-      </div>
-      <div class="card-body">
-        <div class="card-top">
-          <h2>AI Slop Detective</h2>
-          <span class="badge badge-wip">In Progress</span>
-        </div>
-        <p>A writing editor that identifies common AI slop patterns and helps you rewrite to avoid them. It works brilliantly in Google's AI Studio, but I'm yet to adapt it to a public-facing site.</p>
-        <div class="card-divider"></div>
-        <div class="card-meta">
-          <div class="meta-row">
-            <span class="meta-label">Built with</span>
-            <div class="bubbles">
-              <span class="bubble b-yellow">Gemini</span>
-              <span class="bubble b-gray">AI Studio</span>
-            </div>
-          </div>
-          <div class="meta-row">
-            <span class="meta-label">Stack</span>
-            <div class="bubbles">
-              <span class="bubble b-yellow">Frontend</span>
-              <span class="bubble b-coral">API</span>
-            </div>
+          <div class="tags">
+            <span class="tag">AI product</span>
+            <span class="tag">vibe coding</span>
+            <span class="tag">Gemini</span>
+            <span class="tag">Claude</span>
+            <span class="tag">Netlify</span>
           </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- ============================================================
-         CARD: OH REALLY?
-         Status: In Progress. Image: images/oh-really.png
-    ============================================================ -->
-    <div class="card card-static">
-      <div class="card-image">
-        <img src="images/oh-really.png" alt="Oh Really screenshot" onerror="this.style.display='none'">
-        <div class="card-image-placeholder"><span class="ph-kicker">In Progress</span><span class="ph-title">Oh Really?</span></div>
-      </div>
-      <div class="card-body">
-        <div class="card-top">
-          <h2>Oh Really?</h2>
-          <span class="badge badge-wip">In Progress</span>
-        </div>
-        <p>This was my Dad's idea, and we coded it together in an afternoon. It cites academic sources to prove or debunk things you've heard, but I'm yet to adapt it to a public-facing site.</p>
-        <div class="card-divider"></div>
-        <div class="card-meta">
-          <div class="meta-row">
-            <span class="meta-label">Built with</span>
-            <div class="bubbles">
-              <span class="bubble b-yellow">Gemini</span>
-            </div>
-          </div>
-          <div class="meta-row">
-            <span class="meta-label">Stack</span>
-            <div class="bubbles">
-              <span class="bubble b-yellow">Frontend</span>
-              <span class="bubble b-coral">API</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- /grid -->
-
-
-  <!-- VIDEOS -->
-  <div class="section-label">Videos</div>
-  <div class="video-grid">
-
-    <!-- WHAT THE DRAW?! — YouTube ID: 1eNymDbk190 -->
-    <a href="https://youtu.be/1eNymDbk190" target="_blank" class="video-card">
-      <div class="video-thumb">
-        <img src="https://img.youtube.com/vi/1eNymDbk190/maxresdefault.jpg"
-             onerror="this.src='https://img.youtube.com/vi/1eNymDbk190/hqdefault.jpg'"
-             alt="What the Draw?! video thumbnail">
-        <div class="play-btn">
-          <div class="play-icon">
-            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-          </div>
-        </div>
-      </div>
-      <div class="video-body">
-        <span class="video-kicker">2UP Games · Retired Project</span>
-        <h2>What the Draw?!</h2>
-        <p>Our first live game using generative AI. I led the team which made What the Draw?!, where anyone can make a masterpiece.</p>
-      </div>
-    </a>
-
-    <!-- GET CRAFTY — YouTube ID: X4cuyRs1kBQ -->
-    <a href="https://youtube.com/shorts/X4cuyRs1kBQ" target="_blank" class="video-card">
-      <div class="video-thumb">
-        <img src="https://img.youtube.com/vi/X4cuyRs1kBQ/maxresdefault.jpg"
-             onerror="this.src='https://img.youtube.com/vi/X4cuyRs1kBQ/hqdefault.jpg'"
-             alt="Get Crafty video thumbnail">
-        <div class="play-btn">
-          <div class="play-icon">
-            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-          </div>
-        </div>
-      </div>
-      <div class="video-body">
-        <span class="video-kicker">2UP Games · Retired Project</span>
-        <h2>Get Crafty!</h2>
-        <p>The followup where users can indulge in mindful crafting. We gave players control with a simple stencil input method, and loveable outputs using our own custom pipeline.</p>
-      </div>
-    </a>
-
-  </div><!-- /video-grid -->
-
-  <!-- ABOUT -->
-  <div class="about">
-    <div class="section-label">About</div>
-    <div class="about-inner">
+    <!-- FOOTER -->
+    <footer>
       <div>
-        <!-- To use a photo: replace the div.avatar below with:
-             <img src="images/joe.jpg" style="width:96px;height:96px;border-radius:50%;object-fit:cover"> -->
-        <img src="images/joe.jpg" style="width:128px;height:128px;border-radius:50%;object-fit:cover"></div>
+        <div class="footer-brand">Joe's Showcase</div>
+        <p class="footer-copy">© Joe Raeburn — <span id="year"></span></p>
       </div>
-      <div>
-        <h3>Hi, I'm Joe.</h3>
-        <p>I really like making things. Over the past year this has become easier with brilliant tools to help make things quicker. My main goal has been to learn the opportunities and struggles of making things using generative AI.</p>
-        <p>This is my public scratchpad. Some things are polished. Most are experiments. All of them were fun to make.</p>
-        <div class="tags">
-          <span class="tag">AI product</span>
-          <span class="tag">vibe coding</span>
-          <span class="tag">Gemini</span>
-          <span class="tag">Claude</span>
-          <span class="tag">Netlify</span>
+      <div class="footer-links">
+        <a href="#" class="footer-link underlined">Back to Top ↑</a>
+      </div>
+    </footer>
+
+  </main>
+
+  <script>
+    // ── DATA ──
+    const PROJECTS = [
+      {
+        id: 'medchecker',
+        title: 'Medchecker',
+        url: 'https://medcheker.netlify.app/',
+        status: 'live',
+        kicker: 'Live demo',
+        description: 'Helps parents double-check medication. I made this after my daughter had paracetamol poisoning from an incorrect dose.',
+        tools: ['Codex', 'VS Code', 'Netlify'],
+        stack: ['Frontend', 'API'],
+        image: 'images/medcheker.png'
+      },
+      {
+        id: 'baitclicker',
+        title: 'Baitclicker',
+        url: 'https://baitclicker.netlify.app/',
+        status: 'live',
+        kicker: 'Live demo',
+        description: 'Turns any news article into an idle clicker game. There were some fun backend challenges making this one, including sharing your creations.',
+        tools: ['Codex', 'VS Code', 'Netlify'],
+        stack: ['Frontend', 'Backend', 'API'],
+        image: 'images/baitclicker.png'
+      },
+      {
+        id: 'maths-monsters',
+        title: 'Maths Monsters',
+        url: 'https://maths-monsters.netlify.app/',
+        status: 'live',
+        kicker: 'Live demo',
+        description: 'A physical card game prototype with stickers driving long-term goals. Built to test core interaction and repeatable practice.',
+        tools: ['Gemini', 'AI Studio'],
+        stack: ['Frontend'],
+        image: 'images/maths-monsters.png'
+      },
+      {
+        id: 'slop-detective',
+        title: 'AI Slop Detective',
+        url: 'https://slop-detective.netlify.app/',
+        status: 'live',
+        kicker: 'Live demo',
+        description: 'Analyses writing to detect common AI slop patterns — robotic phrasing, hollow structure, and the Ikea Effect.',
+        tools: ['Gemini', 'AI Studio'],
+        stack: ['Frontend', 'API'],
+        image: 'images/slop-detective.png'
+      }
+    ];
+
+    const VIDEOS = [
+      {
+        id: 'draw',
+        youtubeId: '1eNymDbk190',
+        title: "What the Draw?!",
+        kicker: '2UP Games · Retired Project',
+        description: 'Our first live game using generative AI. I led the team that built it, where anyone can make a masterpiece.',
+        url: 'https://youtu.be/1eNymDbk190'
+      },
+      {
+        id: 'crafty',
+        youtubeId: 'X4cuyRs1kBQ',
+        isShort: true,
+        title: 'Get Crafty!',
+        kicker: '2UP Games · Retired Project',
+        description: 'A mindful crafting experience. Players control creation with stencils and custom generative pipelines.',
+        url: 'https://youtube.com/shorts/X4cuyRs1kBQ'
+      }
+    ];
+
+    // ── STACK COLORS ──
+    const stackColors = ['stack-accent', 'stack-ink', 'stack-ghost'];
+
+    // ── BUILD CARD HTML ──
+    function buildCard(project, isLink) {
+      const tag = isLink ? 'a' : 'div';
+      const href = isLink ? `href="${project.url}" target="_blank"` : '';
+      const disabledClass = !isLink ? 'disabled' : '';
+
+      const tools = project.tools.map(t => `<span class="tool-tag">/ ${t}</span>`).join('');
+      const stack = project.stack.map((s, i) => `<span class="stack-tag ${stackColors[i % stackColors.length]}">${s}</span>`).join('');
+      const cta = isLink ? `<div class="card-cta">View Project <span class="arrow">→</span></div>` : '';
+
+      return `
+        <${tag} ${href} class="card ${disabledClass}" data-observe>
+          <div class="card-image">
+            <img src="${project.image}" alt="${project.title}" onerror="handleImgError(this, '${project.kicker}', '${project.title}')">
+          </div>
+          <div class="card-body">
+            <h2 class="card-title">${project.title}</h2>
+            <p class="card-desc">${project.description}</p>
+            <div class="card-meta">
+              <div class="meta-row">
+                <span class="meta-label">Tools</span>
+                <div class="meta-values">${tools}</div>
+              </div>
+              <div class="meta-row">
+                <span class="meta-label">Stack</span>
+                <div class="meta-values">${stack}</div>
+              </div>
+            </div>
+            ${cta}
+          </div>
+        </${tag}>
+      `;
+    }
+
+    function handleImgError(img, kicker, title) {
+      const wrap = img.parentElement;
+      wrap.innerHTML = `
+        <div class="card-fallback">
+          <p class="kicker">${kicker}</p>
+          <h3>${title}</h3>
         </div>
-      </div>
-    </div>
-  </div>
+      `;
+    }
 
-  <footer>© 2026 Joe Raeburn</footer>
+    function getYoutubeThumbnail(youtubeId, isShort) {
+      return isShort
+        ? `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`
+        : `https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg`;
+    }
 
-</div><!-- /wrap -->
+    function buildVideoCard(video) {
+      const thumb = getYoutubeThumbnail(video.youtubeId, video.isShort);
+      return `
+        <a href="${video.url}" target="_blank" class="video-card" data-observe>
+          <div class="video-thumb">
+            <img src="${thumb}" alt="${video.title}">
+            <div class="play-btn">
+              <div class="play-circle"><div class="play-icon"></div></div>
+            </div>
+          </div>
+          <div class="video-info">
+            <p class="video-kicker">${video.kicker}</p>
+            <h2 class="video-title">${video.title}</h2>
+            <p class="video-desc">${video.description}</p>
+          </div>
+        </a>
+      `;
+    }
+
+    // ── RENDER ──
+    document.getElementById('demos-grid').innerHTML = PROJECTS.map(p => buildCard(p, true)).join('');
+    document.getElementById('video-grid').innerHTML = VIDEOS.map(v => buildVideoCard(v)).join('');
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Back to top
+    document.querySelector('.footer-link.underlined').addEventListener('click', (e) => {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // ── INTERSECTION OBSERVER (row-aware left→right stagger, re-animates on scroll up) ──
+    const animatables = document.querySelectorAll('[data-observe]');
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const el = entry.target;
+
+        if (entry.isIntersecting) {
+          // Find all siblings in the same grid row that are also entering
+          const parent = el.parentElement;
+          const siblings = Array.from(parent.querySelectorAll('[data-observe]'));
+          const elTop = Math.round(el.getBoundingClientRect().top + window.scrollY);
+
+          let colIndex = 0;
+          siblings.forEach(sib => {
+            const sibTop = Math.round(sib.getBoundingClientRect().top + window.scrollY);
+            if (Math.abs(sibTop - elTop) < 20) {
+              sib.style.transitionDelay = `${colIndex * 0.1}s`;
+              sib.classList.add('in-view');
+              colIndex++;
+            }
+          });
+          // Catch el itself if not already handled
+          if (!el.classList.contains('in-view')) {
+            el.style.transitionDelay = '0s';
+            el.classList.add('in-view');
+          }
+        } else {
+          // Scrolled out — reset so it re-animates next time
+          el.style.transitionDelay = '0s';
+          el.classList.remove('in-view');
+        }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -60px 0px' });
+
+    animatables.forEach(el => observer.observe(el));
+
+    // ── SCROLL: ORB + SHOWCASE COLOUR FILL ──
+    const orb = document.getElementById('orb');
+    const showcaseWord = document.getElementById('showcase-word');
+    const pageH = () => document.body.scrollHeight - window.innerHeight;
+
+    function updateScroll() {
+      const p = pageH() > 0 ? Math.min(window.scrollY / pageH(), 1) : 0;
+
+      // Orb drifts diagonally bottom-left → top-right
+      const x = -200 + p * (window.innerWidth * 0.7);
+      const y = window.innerHeight * 0.6 - p * (window.innerHeight * 0.9 + 200);
+      orb.style.transform = `translate(${x}px, ${y}px)`;
+
+      // SHOWCASE fills from outline → lime as you scroll
+      // Starts changing immediately, fully lime by ~30% scroll
+      const fillProgress = Math.min(p / 0.3, 1);
+      // Interpolate: transparent → #E0FF00
+      const r = Math.round(224 * fillProgress);
+      const g = Math.round(255 * fillProgress);
+      const b = 0;
+      const alpha = fillProgress;
+      showcaseWord.style.color = `rgba(${r}, ${g}, ${b}, ${alpha})`;
+      // Also fade out the stroke as fill comes in
+      const strokeOpacity = 1 - fillProgress * 0.6;
+      showcaseWord.style.webkitTextStroke = `1.5px rgba(26,26,26,${strokeOpacity})`;
+    }
+
+    updateScroll();
+    window.addEventListener('scroll', updateScroll, { passive: true });
+  </script>
 </body>
 </html>
