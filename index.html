@@ -386,8 +386,8 @@
     @media (min-width: 1024px) {
       .video-card { filter: grayscale(1); }
       .video-card.in-view { animation: colorFlashToGray 1500ms ease var(--stagger-delay, 0s); }
+      .video-card:hover { filter: grayscale(0); }
     }
-    .video-card:hover { filter: grayscale(0); }
 
     .video-thumb {
       position: relative;
@@ -494,18 +494,39 @@
       overflow: hidden;
     }
 
-    .about-photo-wrap:hover {
-      filter: grayscale(0);
-    }
+    @media (min-width: 1024px) {
+      .about-photo-wrap:hover {
+        filter: grayscale(0);
+      }
 
-    .about-photo-wrap.in-view {
-      animation: colorFlashToGray 2s ease;
+      .about-photo-wrap.in-view {
+        animation: colorFlashToGray 2s ease;
+      }
     }
 
     .about-photo-wrap img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+    }
+
+    @media (max-width: 1023px) {
+      .card-image,
+      .video-card,
+      .about-photo-wrap {
+        filter: grayscale(var(--mobile-gray, 1));
+      }
+
+      .card-image,
+      .about-photo-wrap {
+        transition: filter 0.15s linear;
+      }
+
+      .video-card {
+        transition: opacity 0.7s cubic-bezier(0.215, 0.61, 0.355, 1),
+                    transform 0.7s cubic-bezier(0.215, 0.61, 0.355, 1),
+                    filter 0.15s linear;
+      }
     }
 
     .about-photo-fallback {
@@ -914,6 +935,47 @@
     }, { threshold: 0.08, rootMargin: '0px 0px -60px 0px' });
 
     animatables.forEach(el => observer.observe(el));
+
+    // Mobile: colour peaks at viewport centre, then fades back to grayscale near the edges.
+    const mobileFocusMedia = window.matchMedia('(max-width: 1023px)');
+    const mobileColorItems = Array.from(document.querySelectorAll('.card-image, .video-card, .about-photo-wrap'));
+    let mobileColorFrame = null;
+
+    function updateMobileColorFocus() {
+      mobileColorFrame = null;
+
+      if (!mobileFocusMedia.matches) {
+        mobileColorItems.forEach(item => item.style.removeProperty('--mobile-gray'));
+        return;
+      }
+
+      const viewportCenter = window.innerHeight / 2;
+      const colorRadius = window.innerHeight * 0.12;
+      const fadeRadius = window.innerHeight * 0.38;
+
+      mobileColorItems.forEach(item => {
+        const rect = item.getBoundingClientRect();
+        const itemCenter = rect.top + rect.height / 2;
+        const distance = Math.abs(itemCenter - viewportCenter);
+        const grayscale = Math.min(Math.max((distance - colorRadius) / fadeRadius, 0), 1);
+
+        item.style.setProperty('--mobile-gray', grayscale.toFixed(3));
+      });
+    }
+
+    function requestMobileColorFocusUpdate() {
+      if (mobileColorFrame !== null) return;
+      mobileColorFrame = window.requestAnimationFrame(updateMobileColorFocus);
+    }
+
+    requestMobileColorFocusUpdate();
+    window.addEventListener('scroll', requestMobileColorFocusUpdate, { passive: true });
+    window.addEventListener('resize', requestMobileColorFocusUpdate);
+    if (mobileFocusMedia.addEventListener) {
+      mobileFocusMedia.addEventListener('change', requestMobileColorFocusUpdate);
+    } else {
+      mobileFocusMedia.addListener(requestMobileColorFocusUpdate);
+    }
 
     // ── SCROLL: ORB + SHOWCASE COLOUR FILL ──
     const orb = document.getElementById('orb');
