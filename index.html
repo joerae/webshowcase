@@ -621,8 +621,12 @@
       transition: text-decoration 0.2s;
     }
 
-    .footer-link:hover { text-decoration: line-through; text-decoration-color: var(--accent); text-decoration-thickness: 2px; }
-    .footer-link.underlined { text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 2px; text-underline-offset: 4px; }
+    .footer-link:hover {
+      text-decoration: underline;
+      text-decoration-color: var(--accent);
+      text-decoration-thickness: 2px;
+      text-underline-offset: 4px;
+    }
 
     /* ── ANIMATIONS ── */
     @keyframes fadeScale {
@@ -707,6 +711,7 @@
         <p class="footer-copy">© Joe Raeburn — <span id="year"></span></p>
       </div>
       <div class="footer-links">
+        <a href="https://www.linkedin.com/in/joeraeburn/" target="_blank" rel="noopener" class="footer-link">LinkedIn</a>
         <a href="#" class="footer-link underlined">Back to Top ↑</a>
       </div>
     </footer>
@@ -783,7 +788,11 @@
     ];
 
     // ── STACK COLORS ──
-    const stackColors = ['stack-accent', 'stack-ink', 'stack-ghost'];
+    const stackColors = {
+      Frontend: 'stack-ghost',
+      Backend: 'stack-ink',
+      API: 'stack-accent'
+    };
 
     // ── BUILD CARD HTML ──
     function buildCard(project, isLink) {
@@ -792,7 +801,7 @@
       const disabledClass = !isLink ? 'disabled' : '';
 
       const tools = project.tools.map(t => `<span class="tool-tag">/ ${t}</span>`).join('');
-      const stack = project.stack.map((s, i) => `<span class="stack-tag ${stackColors[i % stackColors.length]}">${s}</span>`).join('');
+      const stack = project.stack.map(s => `<span class="stack-tag ${stackColors[s] || 'stack-ghost'}">${s}</span>`).join('');
       const cta = isLink ? `<div class="card-cta">View Project <span class="arrow">→</span></div>` : '';
 
       return `
