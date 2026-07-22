@@ -22,6 +22,7 @@
       --bg: #FAF9F6;
       --ink: #1A1A1A;
       --muted: #666666;
+      --automation: lavender;
       --font-display: 'Syne', sans-serif;
       --font-body: 'Inter', sans-serif;
     }
@@ -318,6 +319,7 @@
     .stack-accent { background: var(--accent); color: var(--ink); }
     .stack-ink { background: var(--ink); color: var(--bg); }
     .stack-ghost { background: rgba(102,102,102,0.1); color: var(--muted); border: 1px solid rgba(26,26,26,0.1); }
+    .stack-automation { background: var(--automation); color: var(--ink); }
 
     .card-cta {
       margin-top: 2rem;
@@ -684,8 +686,8 @@
     <!-- LIVE DEMOS -->
     <section id="demos">
       <div class="section-header">
-        <span class="section-label">Index / Demos</span>
-        <span class="section-count">01 — 05</span>
+        <span class="section-label">Index</span>
+        <span class="section-count">01 — 06</span>
       </div>
       <div class="grid-3" id="demos-grid">
         <!-- Cards injected by JS -->
@@ -767,6 +769,17 @@
         image: 'images/baitclicker.png'
       },
       {
+        id: 'nz-sup-check',
+        title: 'NZ SUP Check',
+        url: 'https://nz-sup-check.joeraeburn.com/',
+        status: 'live',
+        kicker: 'Live demo',
+        description: 'Daily paddleboarding conditions for your local beach, delivered before breakfast. I made this to explore what AI and automation tools can do.',
+        tools: ['Make', 'Claude', 'Resend'],
+        stack: ['Frontend', 'API', 'Automation'],
+        image: 'images/nz-sup-check.png'
+      },
+      {
         id: 'maths-monsters',
         title: 'Maths Monsters',
         url: 'https://maths-monsters.joeraeburn.com/',
@@ -825,7 +838,8 @@
     const stackColors = {
       Frontend: 'stack-ghost',
       Backend: 'stack-ink',
-      API: 'stack-accent'
+      API: 'stack-accent',
+      Automation: 'stack-automation'
     };
 
     // ── BUILD CARD HTML ──
