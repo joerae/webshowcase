@@ -2,7 +2,7 @@
 
 Personal portfolio hub for AI/vibe-coding demo projects. Single static HTML file, deployed automatically to Netlify on push.
 
-**Live site:** `https://YOUR-SITE.netlify.app` ← update this once deployed
+**Live site:** `https://joeraeburn.com` ← update this once deployed
 
 ---
 
